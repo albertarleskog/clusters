@@ -168,10 +168,6 @@ local applications = {
                          values: |||
                            controller:
                              allowSnippetAnnotations: true
-                             service:
-                               ipFamilyPolicy: RequireDualStack
-                               internal:
-                                 ipFamilyPolicy: RequireDualStack
                              ingressClassResource:
                                default: true
                              metrics:
