@@ -1,6 +1,7 @@
 local application = import 'application.libsonnet';
 local externalDns = import 'external-dns.libsonnet';
 local gotify = import 'gotify.libsonnet';
+local wikijs = import 'wikijs.libsonnet';
 
 local defaults = {
   cluster: 'alfheimr',
@@ -70,6 +71,11 @@ local root = {
     image: "ghcr.io/gotify/server-arm64:2.4",
     subdomain: "notify",
     domain: defaults.domain
+  }),
+  wikijs: wikijs({
+    clusterIssuer: "letsencrypt-prod",
+    version: "2",
+    domain: defaults.domain,
   })
 };
 
@@ -373,7 +379,8 @@ local applications = {
                   |||,
                 },
               }),
-  gotify: createApplication({ name: "gotify", namespace: "gotify"})
+  gotify: createApplication({ name: "gotify", namespace: "gotify"}),
+  wikijs: createApplication({ name: "wikijs", namespace: "wikijs" }),
 };
 
 {
