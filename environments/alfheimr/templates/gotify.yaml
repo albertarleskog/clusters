@@ -1,0 +1,21 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "gotify"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "gotify"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    path: "environments/alfheimr/gotify"
+    repoURL: "https://github.com/albertarleskog/clusters.git"
+    targetRevision: "HEAD"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"

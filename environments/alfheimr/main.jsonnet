@@ -1,5 +1,6 @@
 local application = import 'application.libsonnet';
 local externalDns = import 'external-dns.libsonnet';
+local gotify = import 'gotify.libsonnet';
 
 local defaults = {
   cluster: 'alfheimr',
@@ -63,6 +64,13 @@ local root = {
       },
     },
   },
+  gotify: gotify({
+    name: "gotify",
+    namespace: "gotify",
+    image: "ghcr.io/gotify/server-arm64:2.4",
+    subdomain: "notify",
+    domain: defaults.domain
+  })
 };
 
 local applications = {
@@ -364,6 +372,7 @@ local applications = {
                   |||,
                 },
               }),
+  gotify: createApplication({ name: "gotify", namespace: "gotify"})
 };
 
 {
