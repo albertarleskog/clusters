@@ -281,7 +281,7 @@ local applications = {
   keycloakx: createApplication({ name: 'keycloakx', namespace: 'keycloakx' })
              + application.spec.withSource({
                repoURL: 'https://codecentric.github.io/helm-charts',
-               targetRevision: '2.2.1',
+               targetRevision: '2.3.0',
                chart: 'keycloakx',
                helm: {
                  values: |||
