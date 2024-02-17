@@ -2,6 +2,7 @@ local application = import 'application.libsonnet';
 local externalDns = import 'external-dns.libsonnet';
 local gotify = import 'gotify.libsonnet';
 local wikijs = import 'wikijs.libsonnet';
+local blocky = import 'blocky.libsonnet';
 
 local defaults = {
   cluster: 'alfheimr',
@@ -76,6 +77,14 @@ local root = {
     clusterIssuer: "letsencrypt-prod",
     version: "2",
     domain: defaults.domain,
+  }),
+  blocky: blocky({
+    name: "blocky",
+    image: "spx01/blocky:v0.23",
+    namespace: "blocky",
+    subdomain: "dns",
+    domain: defaults.domain,
+    replicas: 3
   })
 };
 
@@ -381,6 +390,7 @@ local applications = {
               }),
   gotify: createApplication({ name: "gotify", namespace: "gotify"}),
   wikijs: createApplication({ name: "wikijs", namespace: "wikijs" }),
+  blocky: createApplication({ name: "blocky", namespace: "blocky" })
 };
 
 {
