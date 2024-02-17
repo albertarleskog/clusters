@@ -5,7 +5,7 @@ local defaults = {
   cluster: 'alfheimr',
   domain: 'alfheimr.arleskog.se',
   repoURL: 'https://github.com/albertarleskog/clusters.git',
-  path: "environments/%s" %  self.cluster
+  path: 'environments/%s' % self.cluster,
 };
 
 local createApplication(config) =
@@ -14,55 +14,55 @@ local createApplication(config) =
   + application.spec.withDestination({ namespace: config.namespace });
 
 local root = {
-  ["cert-manager"]: {}
-    + {
-      [endpoint.key]: {
-        apiVersion: "cert-manager.io/v1",
-        kind: "ClusterIssuer",
-        metadata: {
-          name: endpoint.key
-        },
-        spec: {
-          acme: {
-            server: endpoint.value,
-            email: "albert@arleskog.se",
-            privateKeySecretRef: {
-              name: endpoint.key
-            },
-            solvers: [
-              { http01: { ingress: { ingressClassName:  "nginx" } } }
-            ]
-          }
-        }
-      }
-      for endpoint in std.objectKeysValues({
-        "letsencrypt-prod": "https://acme-v02.api.letsencrypt.org/directory",
-        "letsencrypt-stag": "https://acme-staging-v02.api.letsencrypt.org/directory"
-      })
-    },
-  ["external-dns"]: externalDns(
+  'cert-manager': {}
+                  + {
+                    [endpoint.key]: {
+                      apiVersion: 'cert-manager.io/v1',
+                      kind: 'ClusterIssuer',
+                      metadata: {
+                        name: endpoint.key,
+                      },
+                      spec: {
+                        acme: {
+                          server: endpoint.value,
+                          email: 'albert@arleskog.se',
+                          privateKeySecretRef: {
+                            name: endpoint.key,
+                          },
+                          solvers: [
+                            { http01: { ingress: { ingressClassName: 'nginx' } } },
+                          ],
+                        },
+                      },
+                    }
+                    for endpoint in std.objectKeysValues({
+                      'letsencrypt-prod': 'https://acme-v02.api.letsencrypt.org/directory',
+                      'letsencrypt-stag': 'https://acme-staging-v02.api.letsencrypt.org/directory',
+                    })
+                  },
+  'external-dns': externalDns(
     {
-      image: "docker.io/bitnami/external-dns:0.14.0",
-      namespace: "external-dns",
-      name: "external-dns"
+      image: 'docker.io/bitnami/external-dns:0.14.0',
+      namespace: 'external-dns',
+      name: 'external-dns',
     }
   ),
   metallb: {
     pools: {
-      "apiVersion": "metallb.io/v1beta1",
-      "kind": "IPAddressPool",
-      "metadata": {
-        "name": "hetzner-public",
-        "namespace": "metallb-system"
+      apiVersion: 'metallb.io/v1beta1',
+      kind: 'IPAddressPool',
+      metadata: {
+        name: 'hetzner-public',
+        namespace: 'metallb-system',
       },
-      "spec": {
-        "addresses": [
-          "37.27.42.70/32",
-          "2a01:4f9:c012:c1bd:20::/96"
-        ]
-      }
-    }
-  }
+      spec: {
+        addresses: [
+          '37.27.42.70/32',
+          '2a01:4f9:c012:c1bd:20::/96',
+        ],
+      },
+    },
+  },
 };
 
 local applications = {
@@ -269,6 +269,101 @@ local applications = {
              },
            }
          ),
+  keycloakx: createApplication({ name: 'keycloakx', namespace: 'keycloakx' })
+             + application.spec.withSource({
+               repoURL: 'https://codecentric.github.io/helm-charts',
+               targetRevision: '2.2.1',
+               chart: 'keycloakx',
+               helm: {
+                 values: |||
+                   args:
+                     - "start"
+                     - "--http-enabled=true"
+                     - "--http-port=8080"
+                     - "--hostname-strict=false"
+                     - "--hostname-strict-https=false"
+                     - "--proxy=edge"
+                     - "--db-password=$(cat /vault/secrets/keycloak)"
+                   resources:
+                     requests:
+                       memory: "256Mi"
+                     limits:
+                       cpu: "250m"
+                       memory: "512Mi"
+                   ingress:
+                     enabled: true
+                     ingressClassName: "nginx"
+                     annotations:
+                       cert-manager.io/cluster-issuer: "letsencrypt-prod"
+                       external-dns.alpha.kubernetes.io/hostname: "auth.arleskog.se"
+                       nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+                       {{- with .Values.keycloakx.ingressAnnotations }}
+                       nginx.ingress.kubernetes.io/server-snippet: {{ toYaml .serverSnippet | indent 12 }}
+                       {{- end }}
+                     rules:
+                       - host: auth.arleskog.se
+                         paths:
+                           - path: /realms/
+                             pathType: Prefix
+                           - path: /resources/
+                             pathType: Prefix
+                           - path: /robots.txt
+                             pathType: Prefix
+                           - path: /js/
+                             pathType: Prefix
+                     tls:
+                       - hosts:
+                           - auth.arleskog.se
+                         secretName: auth-arleskog-se-cert
+                   http:
+                     relativePath: "/"
+                   podAnnotations:
+                     vault.hashicorp.com/agent-inject: 'true'
+                     vault.hashicorp.com/role: 'keycloak'
+                     vault.hashicorp.com/agent-inject-secret-keycloak: 'keycloak'
+                     {{- with .Values.keycloakx.podAnnotations }}
+                     vault.hashicorp.com/agent-inject-template-keycloak: {{ toYaml .agentInjectTemplateKeycloak | indent 10 }}
+                     {{- end }}
+                   extraEnv: |
+                     - name: KEYCLOAK_ADMIN
+                       value: admin
+                     - name: JAVA_OPTS
+                       value: >-
+                         -XX:+UseContainerSupport
+                         -XX:MaxRAMPercentage=75.0
+                         -Djava.awt.headless=true
+                         -Djgroups.dns.query=keycloak-headless
+                   serviceAccount:
+                     create: true
+                   service:
+                     annotations:
+                       prometheus.io/scrape: "true"
+                       prometheus.io/port: "8080"
+                   dbchecker:
+                     enabled: true
+                   database:
+                     vendor: postgres
+                     username: keycloak
+                     database: keycloak
+                     hostname: postgresql.db.svc.cluster.local
+                     port: 5432
+                 |||,
+               },
+             }),
+  postgresql: createApplication({ name: 'postgresql', namespace: 'db' })
+              + application.spec.withSource({
+                repoURL: 'https://charts.bitnami.com/bitnami',
+                targetRevision: '12.5.5',
+                chart: 'postgresql',
+                helm: {
+                  values: |||
+                    primary:
+                      persistence:
+                        size: 4Gi
+                        storageClass: longhorn
+                  |||,
+                },
+              }),
 };
 
 {

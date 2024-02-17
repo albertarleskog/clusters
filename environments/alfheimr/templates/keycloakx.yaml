@@ -1,0 +1,94 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "keycloakx"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "keycloakx"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    chart: "keycloakx"
+    helm:
+      values: |
+        args:
+          - "start"
+          - "--http-enabled=true"
+          - "--http-port=8080"
+          - "--hostname-strict=false"
+          - "--hostname-strict-https=false"
+          - "--proxy=edge"
+          - "--db-password=$(cat /vault/secrets/keycloak)"
+        resources:
+          requests:
+            memory: "256Mi"
+          limits:
+            cpu: "250m"
+            memory: "512Mi"
+        ingress:
+          enabled: true
+          ingressClassName: "nginx"
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
+            external-dns.alpha.kubernetes.io/hostname: "auth.arleskog.se"
+            nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+            {{- with .Values.keycloakx.ingressAnnotations }}
+            nginx.ingress.kubernetes.io/server-snippet: {{ toYaml .serverSnippet | indent 12 }}
+            {{- end }}
+          rules:
+            - host: auth.arleskog.se
+              paths:
+                - path: /realms/
+                  pathType: Prefix
+                - path: /resources/
+                  pathType: Prefix
+                - path: /robots.txt
+                  pathType: Prefix
+                - path: /js/
+                  pathType: Prefix
+          tls:
+            - hosts:
+                - auth.arleskog.se
+              secretName: auth-arleskog-se-cert
+        http:
+          relativePath: "/"
+        podAnnotations:
+          vault.hashicorp.com/agent-inject: 'true'
+          vault.hashicorp.com/role: 'keycloak'
+          vault.hashicorp.com/agent-inject-secret-keycloak: 'keycloak'
+          {{- with .Values.keycloakx.podAnnotations }}
+          vault.hashicorp.com/agent-inject-template-keycloak: {{ toYaml .agentInjectTemplateKeycloak | indent 10 }}
+          {{- end }}
+        extraEnv: |
+          - name: KEYCLOAK_ADMIN
+            value: admin
+          - name: JAVA_OPTS
+            value: >-
+              -XX:+UseContainerSupport
+              -XX:MaxRAMPercentage=75.0
+              -Djava.awt.headless=true
+              -Djgroups.dns.query=keycloak-headless
+        serviceAccount:
+          create: true
+        service:
+          annotations:
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "8080"
+        dbchecker:
+          enabled: true
+        database:
+          vendor: postgres
+          username: keycloak
+          database: keycloak
+          hostname: postgresql.db.svc.cluster.local
+          port: 5432
+    repoURL: "https://codecentric.github.io/helm-charts"
+    targetRevision: "2.2.1"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"
