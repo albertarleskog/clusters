@@ -107,7 +107,6 @@ local applications = {
                       clientID: argocd_alfheimr
                       clientSecret: $oidc.keycloak.clientSecret
                       requestedScopes: [openid, profile, email, roles]
-                    admin.enabled: false
                   rbac:
                     policy.csv: |
                       g, admin, role:admin
