@@ -1,0 +1,29 @@
+global:
+  application_namespace: argocd
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/albertarleskog/alfheimr.git
+    targetRevision: HEAD
+  domain_name: alfheimr.arleskog.se
+  oidc_url: https://auth.arleskog.se
+
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/albertarleskog/argocd
+    targetRevision: HEAD
+
+keycloakx:
+  ingressAnnotations:
+    serverSnippet: |
+      {{`location ~* /realms/[^/]+/metrics {
+        return 403;
+      }`}}
+  podAnnotations:
+    agentInjectTemplateKeycloak: |
+      {{`{{- with secret "kv/keycloak" -}}
+      {{ .Data.data.db_password }}
+      {{- end -}}`}}
+
