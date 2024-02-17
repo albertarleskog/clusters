@@ -153,6 +153,7 @@ local applications = {
                        helm: {
                          values: |||
                            controller:
+                             allowSnippetAnnotations: true
                              service:
                                ipFamilyPolicy: RequireDualStack
                                internal:

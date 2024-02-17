@@ -15,6 +15,7 @@ spec:
     helm:
       values: |
         controller:
+          allowSnippetAnnotations: true
           service:
             ipFamilyPolicy: RequireDualStack
             internal:
