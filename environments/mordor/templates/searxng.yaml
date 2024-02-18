@@ -1,0 +1,21 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "searxng"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "searxng"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    path: "environments/mordor/searxng"
+    repoURL: "https://github.com/albertarleskog/clusters.git"
+    targetRevision: "HEAD"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"
