@@ -1,0 +1,1 @@
+{"apiVersion": "v1", "kind": "Service", "metadata": {"name": "forgejo-ssh", "namespace": "forgejo"}, "spec": {"ports": [{"nodePort": 32222, "port": 32222, "targetPort": "ssh"}], "selector": {"app": "forgejo"}, "type": "NodePort"}}
