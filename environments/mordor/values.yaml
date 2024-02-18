@@ -1,0 +1,5 @@
+global:
+  application_namespace: argocd
+  domain_name: mordor.arleskog.se
+  oidc_url: https://auth.arleskog.se
+
