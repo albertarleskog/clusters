@@ -1,0 +1,1 @@
+{"apiVersion": "monitoring.coreos.com/v1", "kind": "ServiceMonitor", "metadata": {"name": "external-dns", "namespace": "external-dns"}, "spec": {"endpoints": [{"interval": "30s", "path": "/metrics", "port": "metrics"}], "selector": {"matchLabels": {"app.kubernetes.io/name": "external-dns"}}}}
