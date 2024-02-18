@@ -1,0 +1,1 @@
+{"apiVersion": "cert-manager.io/v1", "kind": "ClusterIssuer", "metadata": {"name": "letsencrypt-stag"}, "spec": {"acme": {"email": "albert@arleskog.se", "privateKeySecretRef": {"name": "letsencrypt-stag"}, "server": "https://acme-staging-v02.api.letsencrypt.org/directory", "solvers": [{"http01": {"ingress": {"ingressClassName": "nginx"}}}]}}}
