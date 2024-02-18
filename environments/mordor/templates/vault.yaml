@@ -16,10 +16,39 @@ spec:
       values: |
         server:
           ha:
-            replicas: 1
+            replicas: 3
             enabled: true
             raft:
               enabled: true
+              config: |
+                ui = true
+        
+                listener "tcp" {
+                  tls_disable = 1
+                  address = "[::]:8200"
+                  cluster_address = "[::]:8201"
+                  telemetry {
+                    prometheus_retention_time = "1h"
+                    disable_hostname = "true"
+                  }
+                }
+        
+                storage "raft" {
+                  path = "/vault/data"
+                }
+        
+                service_registration "kubernetes" {}
+        
+                seal "transit" {
+                  address = "https://vault.alfheimr.arleskog.se:443"
+                  disable_renewal = "false"
+                  key_name = "autounseal"
+                  mount_path = "transit/"
+                }
+          extraSecretEnvironmentVars:
+            - envName: VAULT_TOKEN
+              secretName: vault
+              secretKey: VAULT_TOKEN
           ingress:
             ingressClassName: nginx
             enabled: true
@@ -33,11 +62,8 @@ spec:
                 hosts:
                   - vault.{{ .Values.global.domain_name }}
           dataStorage:
-            size: 256Mi
             storageClass: longhorn
         ui:
-          enabled: true
-        csi:
           enabled: true
     repoURL: "https://helm.releases.hashicorp.com"
     targetRevision: "0.27.0"
