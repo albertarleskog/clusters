@@ -1,0 +1,1 @@
+{"apiVersion": "cert-manager.io/v1", "kind": "Issuer", "metadata": {"name": "opensearch-cluster", "namespace": "opensearch"}, "spec": {"vault": {"auth": {"kubernetes": {"mountPath": "/v1/auth/kubernetes", "role": "opensearch-cluster", "serviceAccountRef": {"name": "opensearch-cluster"}}}, "path": "pki_int/sign/opensearch-cluster", "server": "https://vault.alfheimr.arleskog.se"}}}

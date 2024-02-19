@@ -1,0 +1,1 @@
+{"apiVersion": "rbac.authorization.k8s.io/v1", "kind": "Role", "metadata": {"name": "opensearch-cluster", "namespace": "opensearch"}, "rules": [{"apiGroups": [""], "resourceNames": ["opensearch-cluster"], "resources": ["serviceaccounts/token"], "verbs": ["create"]}]}
