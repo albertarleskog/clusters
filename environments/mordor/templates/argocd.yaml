@@ -20,7 +20,7 @@ spec:
             oidc.config: |
               name: Keycloak
               issuer: {{ .Values.global.oidc_url }}/realms/default
-              clientID: argocd_alfheimr
+              clientID: argocd_mordor
               clientSecret: $oidc.keycloak.clientSecret
               requestedScopes: [openid, profile, email, roles]
           rbac:
