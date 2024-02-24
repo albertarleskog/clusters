@@ -15,8 +15,6 @@ spec:
     - chart: "metallb"
       helm:
         values: |
-          speaker:
-            enabled: false
           prometheus:
             serviceAccount: kube-prometheus-stack-prometheus
             namespace: kube-prometheus-stack
