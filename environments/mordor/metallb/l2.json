@@ -1,0 +1,1 @@
+{"apiVersion": "metallb.io/v1beta1", "kind": "L2Advertisement", "metadata": {"name": "homelab-public", "namespace": "metallb-system"}, "spec": {"ipAddressPools": ["homelab-public"]}}
