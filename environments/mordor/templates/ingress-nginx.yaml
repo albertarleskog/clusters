@@ -16,6 +16,9 @@ spec:
       values: |
         controller:
           allowSnippetAnnotations: true
+          service:
+            ipFamilies:
+              - IPv6
           ingressClassResource:
             default: true
           metrics:
