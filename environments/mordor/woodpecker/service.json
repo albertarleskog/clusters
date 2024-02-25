@@ -1,1 +1,1 @@
-{"apiVersion": "v1", "kind": "Service", "metadata": {"name": "woodpecker", "namespace": "woodpecker"}, "spec": {"ports": [{"name": "http", "port": 80, "targetPort": "http"}, {"name": "grpc", "port": 9000, "targetPort": "grpc"}], "selector": {"app": "woodpecker"}}}
+{"apiVersion": "v1", "kind": "Service", "metadata": {"name": "woodpecker", "namespace": "woodpecker"}, "spec": {"ports": [{"name": "http", "port": 80, "targetPort": "http"}, {"name": "grpc", "port": 9000, "targetPort": "grpc"}], "selector": {"app.kubernetes.io/name": "woodpecker"}}}
