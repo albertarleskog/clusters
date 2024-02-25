@@ -1,0 +1,1 @@
+{"apiVersion": "rbac.authorization.k8s.io/v1", "kind": "RoleBinding", "metadata": {"name": "fluent-bit", "namespace": "fluent-bit"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "Role", "name": "fluent-bit"}, "subjects": [{"kind": "ServiceAccount", "name": "cert-manager", "namespace": "cert-manager"}]}

@@ -1,0 +1,21 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "fluent-bit"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "fluent-bit"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    path: "environments/mordor/fluent-bit"
+    repoURL: "https://github.com/albertarleskog/clusters.git"
+    targetRevision: "HEAD"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"
