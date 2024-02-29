@@ -28,7 +28,7 @@ spec:
           guaranteedInstanceManagerCPU: 6
           concurrentAutomaticEngineUpgradePerNodeLimit: 1
     repoURL: "https://charts.longhorn.io"
-    targetRevision: "1.5.3"
+    targetRevision: "1.5.4"
   syncPolicy:
     automated:
       prune: true
