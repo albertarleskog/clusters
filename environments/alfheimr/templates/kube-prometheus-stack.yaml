@@ -21,16 +21,10 @@ spec:
         kubeProxy:
           enabled: false
     repoURL: "https://prometheus-community.github.io/helm-charts"
-    spec:
-      syncPolicy:
-        automated:
-          prune: true
-        syncOptions:
-          - "CreateNamespace=true"
-          - "Replace=true"
     targetRevision: "56.2.1"
   syncPolicy:
     automated:
       prune: true
     syncOptions:
       - "CreateNamespace=true"
+      - "Replace=true"
