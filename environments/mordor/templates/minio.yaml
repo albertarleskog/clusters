@@ -1,0 +1,36 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "minio"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "minio"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source: null
+  sources:
+    - chart: "tenant"
+      helm:
+        values: |
+          tenant:
+            pools:
+              - servers: 1
+                volumesPerServer: 3
+                size: 3Ti
+                storageClassName: local-minio
+            metrics:
+              enabled: true
+            prometheusOperator: true
+      repoURL: "https://operator.min.io"
+      targetRevision: "5.0.13"
+    - path: "environments/mordor/minio"
+      repoURL: "https://github.com/albertarleskog/clusters.git"
+      targetRevision: "HEAD"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"

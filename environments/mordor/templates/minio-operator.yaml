@@ -1,0 +1,32 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "minio-operator"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "minio-operator"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    chart: "operator"
+    helm:
+      values: |
+        operator:
+          replicaCount: 1
+          env:
+            - name: OPERATOR_STS_ENABLED
+              value: "on"
+            - name: WATCHED_NAMESPACE
+              value: "minio"
+        console:
+          enabled: false
+    repoURL: "https://operator.min.io"
+    targetRevision: "5.0.13"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"
