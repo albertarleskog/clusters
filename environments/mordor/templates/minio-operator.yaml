@@ -21,6 +21,8 @@ spec:
               value: "on"
             - name: WATCHED_NAMESPACE
               value: "minio"
+            - name: PROMETHEUS_NAMESPACE
+              value: "kube-prometheus-stack"
         console:
           enabled: false
     repoURL: "https://operator.min.io"
