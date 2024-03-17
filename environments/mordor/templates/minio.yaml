@@ -15,7 +15,11 @@ spec:
     - chart: "tenant"
       helm:
         values: |
+          secrets:
+            existingSecret: placeholder
           tenant:
+            configuration:
+              name: myminio-tenant-env-config
             pools:
               - servers: 1
                 volumesPerServer: 3
