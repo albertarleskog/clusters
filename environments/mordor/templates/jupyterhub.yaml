@@ -1,0 +1,50 @@
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+  name: "jupyterhub"
+  namespace: "argocd"
+spec:
+  destination:
+    namespace: "jupyterhub"
+    server: "https://kubernetes.default.svc"
+  project: "default"
+  source:
+    chart: "jupyterhub"
+    helm:
+      values: |
+        proxy:
+          service:
+            type: ClusterIP
+        hub:
+          config:
+            KubeSpawner:
+              k8s_api_request_timeout: 10
+        singleuser:
+          profileList:
+            - display_name: "Minimal"
+              description: "To avoid too much bells and whistles: Python."
+              default: true
+            - display_name: "Spark"
+              description: "The Jupyter Stacks spark image!"
+              kubespawner_override:
+                image: jupyter/all-spark-notebook:spark-3.5.1
+          cpu:
+            limit: .5
+            guarantee: .25
+          memory:
+            limit: 1G
+            guarantee: .5G
+          storage:
+            dynamic:
+              storageClass: csi-cephfs-ssd
+        cull:
+          enabled: false
+    repoURL: "https://hub.jupyter.org/helm-chart/"
+    targetRevision: "3.2.1"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - "CreateNamespace=true"
