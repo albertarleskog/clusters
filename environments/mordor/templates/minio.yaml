@@ -42,6 +42,7 @@ spec:
                   client_max_body_size 0;
                 nginx.ingress.kubernetes.io/configuration-snippet: |
                   chunked_transfer_encoding off;
+                cert-manager.io/cluster-issuer: letsencrypt-prod
               tls:
                 - hosts:
                   - s3.arleskog.se
@@ -59,6 +60,7 @@ spec:
                   client_max_body_size 0;
                 nginx.ingress.kubernetes.io/configuration-snippet: |
                   chunked_transfer_encoding off;
+                cert-manager.io/cluster-issuer: letsencrypt-prod
               tls:
                 - hosts:
                   - console.s3.arleskog.se
