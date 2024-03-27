@@ -26,8 +26,7 @@ spec:
         csiConfig:
           - clusterID: "c48dde4f-49ee-43fd-af6f-80c4fe99aa1d"
             monitors:
-              - "fd69:1337:dead:beef::30:6"
-              - "fd69:1337:dead:beef::30:7"
+              - "pve.infra.arleskog.se"
     repoURL: "https://ceph.github.io/csi-charts"
     targetRevision: "3.10.2"
   syncPolicy:
